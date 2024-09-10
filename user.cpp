@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <fstream>
 #include "home_page.h"
+#include "admin.h"
 using namespace std;
 //variables
 int option = 0;
@@ -36,6 +37,10 @@ int qtycoffee[MAX_DRINKS]; // record qty of coffee
 int teaCount = 0;
 int sodaCount = 0;
 int coffeeCount = 0;
+
+int teaSize = 7;
+int coffeeSize = 5;
+int sodaSize = 4;
 
 //storage drink and price
 
@@ -72,16 +77,29 @@ void printLine(int colWidth, int numCols) {
 }
 
 void user_login() {
-    cout << "\nnew user.register? (y/n): ";
-    cin >> choose;
-    if (choose == 'y' || choose == 'Y') {
-        rg();
-    }
-    else if (choose == 'n' || choose == 'N') {
-        login();
-    }
-    user_home();
+        cout << "\nNew user? Register (y/n): ";
+        while(true){
+        cin >> choose;
+
+        if (choose == 'y' || choose == 'Y') {
+            rg();
+            break;
+        }
+        else if (choose == 'n' || choose == 'N') {
+            login();
+            break;
+        }
+        else if (isdigit(choose)) {
+            cout << "\nNumbers are not allowed. Please enter 'y' or 'n' : ";
+        }
+        else {
+            cout << "\nInvalid choice. Please enter 'y' or 'n' : ";
+        }
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    } 
 }
+
 
 void rg() {
     ofstream g("data.txt");
@@ -119,7 +137,7 @@ void login() {
     getline(f, password);
     f.close();
 
-    string inID, inPassword,empty;
+    string inID, inPassword, empty;
     while (true) {
         cout << " ";
         getline(cin, empty);
@@ -132,6 +150,7 @@ void login() {
 
         if (inID == id && inPassword == password) {
             cout << "Login Successful\nWelcome, " << inID << endl;
+            user_home();
             break;
         }
         else {
@@ -141,21 +160,28 @@ void login() {
                 exit(0);
             }
             else
-            cout << "Incorrect username or password. Try again.\n";
+                cout << "Incorrect username or password. Try again.\n";
             cout << "Attempt left :" << 3 - attempt << "\n";
             cout << "or want to register new member (Y/N) : ";
-            cin >> choose;
             while (true) {
-                if (choose == 'Y' || choose == 'y') {
-                    cout << "\n";
-                    rg();
-                }
-                else if (choose == 'N' || choose == 'n') {
-                    cout << "\n";
-                    login();
-                }
-                else cout << "\nplease re-enter : ";
                 cin >> choose;
+
+                if (choose == 'y' || choose == 'Y') {
+                    rg();
+                    break;
+                }
+                else if (choose == 'n' || choose == 'N') {
+                    login();
+                    break;
+                }
+                else if (isdigit(choose)) {
+                    cout << "\nNumbers are not allowed. Please enter 'y' or 'n' : ";
+                }
+                else {
+                    cout << "\nInvalid enter. Please enter 'y' or 'n' : ";
+                }
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
             }
         }
     }
@@ -187,9 +213,9 @@ void cart() {
     printLine(44, numCols);
     cout << setw(50) << '|' << fixed << setprecision(2) << setw(40) << total << '|' << endl;
     cout << "wanna place order (Y/N)";
-    cin >> choose;
     while (true) {
-        if (choose == 'Y' || choose == 'y') {
+        cin >> choose;
+        if (choose == 'y' || choose == 'Y') {
             if (sodaCount == 0 && teaCount == 0 && coffeeCount == 0) {
                 cout << "your cart is empty " << "\n";
                 cout << "you wanna continue using yuki menu (Y/N) : ";
@@ -200,34 +226,60 @@ void cart() {
                     }
                     else if (choose == 'N' || choose == 'n') {
                         cout << "Thank for using yuki menu ";
-                        exit(0);
+                        return;
                     }
-                    else cout << "INVALID ENTER" << "\n";
-                    cout << "please re-enter : ";
-                    cin >> choose;
+                    else if (isdigit(choose)) {
+                        cout << "\nNumbers are not allowed. Please enter 'y' or 'n' : ";
+                    }
+                    else {
+                        cout << "\nInvalid choice. Please enter 'y' or 'n' : ";
+                    }
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 }
             }
-            else
-                receipt();
+            else receipt();
         }
-        else if (choose == 'N' || choose == 'n') {
-            menu();
+        else if (choose == 'n' || choose == 'N') {
+            user_home();
+            break;
         }
-        else cout << "INVALID ENTER.please re-enter : " << endl;
-        cin >> choose;
+        else if (isdigit(choose)) {
+            cout << "\nNumbers are not allowed. Please enter 'y' or 'n' : ";
+        }
+        else {
+            cout << "\nInvalid choice. Please enter 'y' or 'n' : ";
+        }
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
 }
 
 void user_home() {
     logo();
-    cout << "Our YUKI cafe is make at" << endl;//introduction to the cafe
+    while (true) {
+        cout << "Our YUKI cafe is make at" << endl;//introduction to the cafe
     cout << "----------------------------------------------------------------------------------------------------------------" << endl;
     cout << "1.MENU" << endl;
     cout << "2.CART" << endl;
     cout << "3.QUIT" << endl;
     cout << "ENTER YOUR OPTION = ";
-    cin >> option;
     while (true) {
+        if (cin >> option) {
+            if (cin.peek() == '\n' && option >= 1 && option <= 3) {
+                break;
+            }
+            else {
+                cout << "Invalid input. Please re-enter :  ";
+            }
+        }
+        else {
+            cout << "Invalid input. Please re-enter :  ";
+        }
+
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
         switch (option) {
         case 1:
             menu();
@@ -239,47 +291,53 @@ void user_home() {
 
         case 3:
             cout << "THANK FOR USING YUKI MENU";
-            exit(0);
-
-        default:
-            cout << "please re-enter the option : ";
-            cin >> option;
+            return;
         }
     }
 }
 
 void menu() {
     logo();
-    cout << "----------------------------------------------------------------------------------------------------------------" << endl;
-    cout << "MENU" << endl;
-    cout << "1.TEA" << endl;
-    cout << "2.SODA" << endl;
-    cout << "3.COFFEE" << endl;
-    cout << "Which drink will you like to choose : ";
-    cin >> c;
-    if (c == 0) {// enter 0 bring you back to home
-        user_home();
-    }
-    //tea
-    else 
+    while (true) {
+        cout << "----------------------------------------------------------------------------------------------------------------" << endl;
+        cout << "MENU" << endl;
+        cout << "1.TEA" << endl;
+        cout << "2.SODA" << endl;
+        cout << "3.COFFEE" << endl;
+        cout << "Which drink will you like to choose : ";
         while (true) {
-            switch (c) {
-            case 1:
-                tea();
-                break;
-                //soda
-            case 2:
-                soda();
-                break;
-            case 3:
-                coffee();
-                break;
-            default:
-                cout << "invalid enter.please re-enter :";
-                cin >> c;
-                break;
+            if (cin >> option) {
+                if (cin.peek() == '\n' && option >= 1 && option <= 3) {
+                    break;
+                }
+                else {
+                    cout << "Invalid input. Please re-enter :  ";
+                }
             }
+            else {
+                cout << "Invalid input. Please re-enter :  ";
+            }
+
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
+
+        switch (option) {
+        case 0 :
+            user_home();
+            break;
+        case 1:
+            tea();
+            break;
+            //soda
+        case 2:
+            soda();
+            break;
+        case 3:
+            coffee();
+            break;
+        }
+    }
 }
 
 void tea() {
@@ -297,41 +355,74 @@ void tea() {
 
     //calculate the total of the drink
     cout << "Enter the number drink you want : ";
-    cin >> drt;
+    while (true) {
+        if (cin >> drt) {
+            if (cin.peek() == '\n' && drt >= 0 && option <= MAX_TEAS) {
+                break;
+            }
+            else {
+                cout << "Invalid input. Please re-enter :  ";
+            }
+        }
+        else {
+            cout << "Invalid input. Please re-enter :  ";
+        }
+
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
     if (drt == 0) {
         menu();
     }
     else if (drt >= 1 && drt <= MAX_TEAS) {
-        if (sodaCount < MAX_DRINKS) {
-            drsoda[sodaCount] = drt;
+        if (teaCount < MAX_DRINKS) {
+            drsoda[teaCount] = drt;
             cout << "Enter the quantity of drink: ";
             cin >> qty;
-            qtysoda[sodaCount] = qty;
-            sodaCount++;
+            qtysoda[teaCount] = qty;
+            teaCount++;
         }
         else {
             cout << "Cart is full.\n";
         }
     }
-    else {
-        cout << "INVALID NUMBER,PLEASE ENTER THE VALID NUMBER";
-
-    }
-    cout << endl;
-    cout << "You wanna order more drink (Y/N) : ";//choose wanna order more or no
-    cin >> choose;
-    if (choose == 'Y' || choose == 'y') {//if yes this function will bring you back to menu
-        menu();
-    }
-    else if (choose == 'N' || choose == 'n') {
-        cout << "PLACE ORDER (Y/N) : ";
+    cout << "\nYou wanna order more drink (Y/N) : ";//choose wanna order more or no
+    while (true) {
         cin >> choose;
-        if (choose == 'Y' || choose == 'y') {
-            cart();
+
+        if (choose == 'y' || choose == 'Y') {
+            menu();
+            break;
         }
-        else if (choose == ' N' || choose == 'n') {
-            user_home();
+        else if (choose == 'n' || choose == 'N') {
+            cout << "PLACE ORDER (Y/N) : ";
+            while (true) {
+                cin >> choose;
+                if (choose == 'Y' || choose == 'y') {
+                    cart();
+                }
+                else if (choose == ' N' || choose == 'n') {
+                    menu();
+                    break;
+                }
+                else if (isdigit(choose)) {
+                    cout << "\nNumbers are not allowed. Please enter 'y' or 'n'.";
+                }
+                else {
+                    cout << "\nInvalid choice. Please enter 'y' or 'n'.";
+                }
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
         }
+        else if (isdigit(choose)) {
+            cout << "\nNumbers are not allowed. Please enter 'y' or 'n'.";
+        }
+        else {
+            cout << "\nInvalid choice. Please enter 'y' or 'n'.";
+        }
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
 }
 
@@ -349,44 +440,79 @@ void soda() {
     printLine(colWidth, numCols);
 
     //calculate the total of the drink
-    cout << "Enter the number drink you want : ";
-    cin >> drt;
-    if (drt == 0) {
-        menu();
-    }
-    else if (drt >= 1 && drt <= MAX_SODAS) {
-        if (sodaCount < MAX_DRINKS) {
-            drsoda[sodaCount] = drt;
-            cout << "Enter the quantity of drink: ";
-            cin >> qty;
-            qtysoda[sodaCount] = qty;
-            sodaCount++;
-        }
-        else {
-            cout << "Cart is full.\n";
-        }
-    }
-    else {
-        cout << "INVALID NUMBER,PLEASE ENTER THE VALID NUMBER";
+ 
+        cout << "Enter the number drink you want : ";
+        while (true) {
+            if (cin >> drt) {
+                if (cin.peek() == '\n' && drt >= 0 && option <= MAX_SODAS) {
+                    break;
+                }
+                else {
+                    cout << "Invalid input. Please re-enter :  ";
+                }
+            }
+            else {
+                cout << "Invalid input. Please re-enter :  ";
+            }
 
-    }
-    cout << endl;
-    cout << "You wanna order more drink (Y/N) : ";//choose wanna order more or no
-    cin >> choose;
-    if (choose == 'Y' || choose == 'y') {//if yes this function will bring you back to menu
-        menu();
-    }
-    else if (choose == 'N' || choose == 'n') {
-        cout << "PLACE ORDER (Y/N) : ";
-        cin >> choose;
-        if (choose == 'Y' || choose == 'y') {
-            cart();
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
-        else if (choose == ' N' || choose == 'n') {
+        if (drt == 0) {
             menu();
         }
+        else if (drt >= 1 && drt <= MAX_SODAS) {
+            if (sodaCount < MAX_DRINKS) {
+                drsoda[sodaCount] = drt;
+                cout << "Enter the quantity of drink: ";
+                cin >> qty;
+                qtysoda[sodaCount] = qty;
+                sodaCount++;
+            }
+            else {
+                cout << "Cart is full.\n";
+            }
+        }
+    cout << "\nYou wanna order more drink (Y/N) : ";//choose wanna order more or no
+    while (true) {
+        cin >> choose;
+
+        if (choose == 'y' || choose == 'Y') {
+            menu();
+            break;
+        }
+        else if (choose == 'n' || choose == 'N') {
+            cout << "PLACE ORDER (Y/N) : ";
+            while (true) {
+                cin >> choose;
+                if (choose == 'Y' || choose == 'y') {
+                    cart();
+                }
+                else if (choose == ' N' || choose == 'n') {
+                    menu();
+                    break;
+                }
+                else if (isdigit(choose)) {
+                    cout << "\nNumbers are not allowed. Please enter 'y' or 'n'.";
+                }
+                else {
+                    cout << "\nInvalid choice. Please enter 'y' or 'n'.";
+                }
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+        }
+        else if (isdigit(choose)) {
+                cout << "\nNumbers are not allowed. Please enter 'y' or 'n'.";
+        }
+        else {
+                cout << "\nInvalid choice. Please enter 'y' or 'n'.";
+        }
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+
     }
-}
 
 void coffee() {
     printLine(colWidth, numCols);
@@ -403,41 +529,74 @@ void coffee() {
 
     //calculate the total of the drink
     cout << "Enter the number drink you want : ";
-    cin >> drt;
+    while (true) {
+        if (cin >> drt) {
+            if (cin.peek() == '\n' && drt >= 0 && option <= MAX_COFFEES) {
+                break;
+            }
+            else {
+                cout << "Invalid input. Please re-enter :  ";
+            }
+        }
+        else {
+            cout << "Invalid input. Please re-enter :  ";
+        }
+
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
     if (drt == 0) {
         menu();
     }
     else if (drt >= 1 && drt <= MAX_COFFEES) {
         if (coffeeCount < MAX_DRINKS) {
-            drcoffee[coffeeCount] = drt;
+            drsoda[coffeeCount] = drt;
             cout << "Enter the quantity of drink: ";
             cin >> qty;
-            qtycoffee[coffeeCount] = qty;
+            qtysoda[coffeeCount] = qty;
             coffeeCount++;
         }
         else {
             cout << "Cart is full.\n";
         }
     }
-    else {
-        cout << "INVALID NUMBER,PLEASE ENTER THE VALID NUMBER";
-
-    }
-    cout << endl;
-    cout << "You wanna order more drink (Y/N) : ";//choose wanna order more or no
-    cin >> choose;
-    if (choose == 'Y' || choose == 'y') {//if yes this function will bring you back to menu
-        menu();
-    }
-    else if (choose == 'N' || choose == 'n') {
-        cout << "PLACE ORDER (Y/N) : ";
+    cout << "\nYou wanna order more drink (Y/N) : ";//choose wanna order more or no
+    while (true) {
         cin >> choose;
-        if (choose == 'Y' || choose == 'y') {
-            cart();
-        }
-        else if (choose == ' N' || choose == 'n') {
+
+        if (choose == 'y' || choose == 'Y') {
             menu();
+            break;
         }
+        else if (choose == 'n' || choose == 'N') {
+            cout << "PLACE ORDER (Y/N) : ";
+            while (true) {
+                cin >> choose;
+                if (choose == 'Y' || choose == 'y') {
+                    cart();
+                }
+                else if (choose == ' N' || choose == 'n') {
+                    menu();
+                    break;
+                }
+                else if (isdigit(choose)) {
+                    cout << "\nNumbers are not allowed. Please enter 'y' or 'n'.";
+                }
+                else {
+                    cout << "\nInvalid choice. Please enter 'y' or 'n'.";
+                }
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+        }
+        else if (isdigit(choose)) {
+            cout << "\nNumbers are not allowed. Please enter 'y' or 'n'.";
+        }
+        else {
+            cout << "\nInvalid choice. Please enter 'y' or 'n'.";
+        }
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
 }
 
@@ -446,6 +605,7 @@ void receipt() {
     double tax = total * 0.06;
     double total_2 = total * 1.16;
     cout << "Cash,Credit Card or TNG(C,D,T) : ";
+    while(true){
     cin >> choose;
     printLine(colWidth, numCols);
     cart_result();
@@ -459,23 +619,53 @@ void receipt() {
     else if (choose == 't' || choose == 'T') {
         cout << "Payment Method : TNG\n";
     }
+    else if (isdigit(choose)) {
+        cout << "\nNumbers are not allowed. Please re-enter : ";
+    }
+    else {
+        cout << "\nInvalid enter. Please re-enter : ";
+    }
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
     cout << "Service charge(10%) : " << setprecision(2) << fixed << src << "\n";
     cout << "Tax (6%)            : " << setprecision(2) << fixed << tax << "\n";
     cout << "total payable       : " << setprecision(2) << fixed << total_2 << "\n";
-    exit(0);
+    return;
 }
 
 void update_drink() {
     int option = 0;
     int price = 0;
-    cout << "which type of drink want to update price";
-    cin >> option;
-    while (option != 3) {
+    while (true) {
+        cout << "1.tea\n";
+        cout << "2.soda\n";
+        cout << "3.coffee\n";
+        cout << "which type of drink want to update price";
+        while (true) {
+            if (cin >> option) {
+                if (cin.peek() == '\n' && option >= 1 && option <= 3) {
+                    break;
+                }
+                else {
+                    cout << "Invalid input. Please re-enter :  ";
+                }
+            }
+            else {
+                cout << "Invalid input. Please re-enter :  ";
+            }
+
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
         switch (option) {
+        case 0:
+            staff_function();
+            break;
         case 1:
             printLine(colWidth, numCols);
 
-            cout << setfill( ' ') << '|' << left << setw(6) << "No" << '|' << setw(colWidth2) << "Name" << '|' << setw(colWidth) << "Price(RM)" << '|' << endl;
+            cout << setfill(' ') << '|' << left << setw(6) << "No" << '|' << setw(colWidth2) << "Name" << '|' << setw(colWidth) << "Price(RM)" << '|' << endl;
 
             printLine(colWidth, numCols);
             for (int i = 1; i <= 7; i++) {
@@ -486,17 +676,38 @@ void update_drink() {
             printLine(colWidth, numCols);
 
             //calculate the total of the drink
-            cout << "Enter the number drink you want to change: ";
-            cin >> drt;
-            if (drt == 0) {
-                menu();
+            while (true) {
+                cout << "Enter the number drink you want to change: ";
+                while (true) {
+                    if (cin >> drt) {
+                        if (cin.peek() == '\n' && drt >= 1 && drt <= MAX_TEAS) {
+                            break;
+                        }
+                        else {
+                            cout << "Invalid input. Please re-enter :  ";
+                        }
+                    }
+                    else {
+                        cout << "Invalid input. Please re-enter :  ";
+                    }
+
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                }
+                cin >> drt;
+                if (drt == 0) {
+                    menu();
+                }
+                else if (drt >= 1 && drt <= MAX_TEAS) {
+                    cout << "enter the price : ";
+                    cin >> price;
+                    priceTea[drt] = price;
+                }
             }
-            else if (drt >= 1 && drt <= MAX_TEAS) {
-                cout << "enter the price : ";
-                cin >> price;
-                priceTea[drt] = price;
-            }
+            break;
+        case 2:
             break;
         }
     }
 }
+
